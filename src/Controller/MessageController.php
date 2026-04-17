@@ -71,14 +71,26 @@ class MessageController extends AbstractController
 
         if ($request->isMethod('POST')) {
             $content = trim((string) $request->request->get('content'));
+            $imageFile = $request->files->get('image');
 
-            if ($content === '') {
+            if ($content === '' && !$imageFile) {
                 $this->addFlash('error', 'Le message ne peut pas être vide.');
             } else {
                 $message = new Message();
                 $message->setSender($user);
                 $message->setRecipient($otherUser);
-                $message->setContent($content);
+                $message->setContent($content !== '' ? $content : null);
+
+                if ($imageFile) {
+                    $newFilename = uniqid('', true) . '.' . $imageFile->guessExtension();
+
+                    $imageFile->move(
+                        $this->getParameter('kernel.project_dir') . '/public/uploads/messages',
+                        $newFilename
+                    );
+
+                    $message->setImage($newFilename);
+                }
 
                 $em->persist($message);
                 $em->flush();
@@ -87,7 +99,7 @@ class MessageController extends AbstractController
                     $otherUser->getEmail() ?? '',
                     $otherUser->getUsername() ?? '',
                     $user->getUsername() ?? '',
-                    $message->getContent() ?? ''
+                    $message->getContent() ?? '[Image envoyée]'
                 ));
 
                 $this->addFlash('success', 'Message envoyé avec succès.');

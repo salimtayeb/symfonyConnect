@@ -144,14 +144,31 @@
                                     {{ isMine ? 'Moi' : message.sender.username }}
                                 </p>
 
-                                <p style="
-                                    margin: 0 0 0.55rem 0;
-                                    font-size: 1rem;
-                                    line-height: 1.5;
-                                    white-space: pre-wrap;
-                                ">
-                                    {{ message.content }}
-                                </p>
+                                {% if message.content %}
+                                    <p style="
+                                        margin: 0 0 0.55rem 0;
+                                        font-size: 1rem;
+                                        line-height: 1.5;
+                                        white-space: pre-wrap;
+                                    ">
+                                        {{ message.content }}
+                                    </p>
+                                {% endif %}
+
+                                {% if message.image %}
+                                    <img
+                                        src="{{ asset('uploads/messages/' ~ message.image) }}"
+                                        alt="Image envoyée"
+                                        style="
+                                            max-width: 220px;
+                                            width: 100%;
+                                            border-radius: 12px;
+                                            margin-bottom: 0.55rem;
+                                            display: block;
+                                            box-shadow: 0 6px 14px rgba(0,0,0,0.10);
+                                        "
+                                    >
+                                {% endif %}
 
                                 <p style="
                                     margin: 0;
@@ -172,7 +189,7 @@
                 border-top: 1px solid #e9eef8;
                 background: #ffffff;
             ">
-                <form method="post" style="display: flex; flex-direction: column; gap: 0.9rem;">
+                <form method="post" enctype="multipart/form-data" style="display: flex; flex-direction: column; gap: 0.9rem;">
                     <label for="content" style="
                         font-size: 1rem;
                         font-weight: 700;
@@ -185,7 +202,7 @@
                         id="content"
                         name="content"
                         rows="4"
-                        placeholder="Écris ton message ici..."
+                        placeholder="Écris ton message ici... 😀"
                         style="
                             width: 100%;
                             box-sizing: border-box;
@@ -198,6 +215,37 @@
                             outline: none;
                         "
                     ></textarea>
+
+                    <input
+                        type="file"
+                        name="image"
+                        accept="image/*"
+                        style="
+                            font-size: 0.95rem;
+                            color: #374151;
+                        "
+                    >
+
+                    <div id="image-preview" style="display: none;">
+                        <p style="
+                            font-size: 0.9rem;
+                            margin: 0 0 0.5rem 0;
+                            color: #374151;
+                            font-weight: 600;
+                        ">
+                            Aperçu :
+                        </p>
+                        <img
+                            id="preview-img"
+                            alt="Aperçu de l'image"
+                            style="
+                                max-width: 200px;
+                                border-radius: 10px;
+                                display: block;
+                                box-shadow: 0 6px 14px rgba(0,0,0,0.10);
+                            "
+                        >
+                    </div>
 
                     <div style="display: flex; justify-content: flex-end;">
                         <button
@@ -226,6 +274,9 @@
         document.addEventListener('DOMContentLoaded', function () {
             const container = document.querySelector('[data-messages]');
             const textarea = document.getElementById('content');
+            const inputFile = document.querySelector('input[name="image"]');
+            const previewContainer = document.getElementById('image-preview');
+            const previewImg = document.getElementById('preview-img');
 
             if (container) {
                 container.scrollTop = container.scrollHeight;
@@ -233,6 +284,26 @@
 
             if (textarea) {
                 textarea.focus();
+            }
+
+            if (inputFile) {
+                inputFile.addEventListener('change', function () {
+                    const file = this.files[0];
+
+                    if (file) {
+                        const reader = new FileReader();
+
+                        reader.onload = function (e) {
+                            previewImg.src = e.target.result;
+                            previewContainer.style.display = 'block';
+                        };
+
+                        reader.readAsDataURL(file);
+                    } else {
+                        previewImg.src = '';
+                        previewContainer.style.display = 'none';
+                    }
+                });
             }
         });
     </script>
