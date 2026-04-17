@@ -1,0 +1,128 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Découvrir{% endblock %}
+
+{% block body %}
+<style>
+    .discover-page {
+        max-width: 720px;
+        margin: 40px auto;
+        padding: 0 16px 40px;
+    }
+
+    .discover-title {
+        font-size: 32px;
+        font-weight: 700;
+        margin-bottom: 24px;
+        color: #1f2937;
+    }
+
+    .discover-card {
+        background: #ffffff;
+        border: 1px solid #e5e7eb;
+        border-radius: 18px;
+        padding: 20px;
+        box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
+    }
+
+    .discover-list {
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+    }
+
+    .discover-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 12px 0;
+        border-top: 1px solid #f3f4f6;
+    }
+
+    .discover-item:first-child {
+        border-top: none;
+        padding-top: 0;
+    }
+
+    .discover-user {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        text-decoration: none;
+        color: inherit;
+    }
+
+    .discover-avatar {
+        width: 46px;
+        height: 46px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #60a5fa, #2563eb);
+        color: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+    }
+
+    .discover-name {
+        font-weight: 700;
+        color: #111827;
+    }
+
+    .discover-meta {
+        font-size: 13px;
+        color: #6b7280;
+    }
+
+    .follow-button {
+        border: none;
+        border-radius: 10px;
+        padding: 8px 14px;
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+        background: linear-gradient(135deg, #60a5fa, #2563eb);
+        color: #fff;
+    }
+
+    .empty-discover {
+        color: #6b7280;
+        text-align: center;
+        padding: 12px 0;
+    }
+</style>
+
+<div class="discover-page">
+    <h1 class="discover-title">Découvrir de nouveaux amis</h1>
+
+    <div class="discover-card">
+        <div class="discover-list">
+            {% for user in users %}
+                <div class="discover-item">
+                    <a href="{{ path('app_profile', {username: user.username}) }}" class="discover-user">
+                        <div class="discover-avatar">
+                            {{ user.username|slice(0, 1)|upper }}
+                        </div>
+
+                        <div>
+                            <div class="discover-name">{{ user.username }}</div>
+                            <div class="discover-meta">
+                                Inscrit le {{ user.createdAt|date('d/m/Y') }}
+                            </div>
+                        </div>
+                    </a>
+
+                    <form method="post" action="{{ path('app_profile_follow', {username: user.username}) }}">
+                        <button type="submit" class="follow-button">Follow</button>
+                    </form>
+                </div>
+            {% else %}
+                <div class="empty-discover">
+                    Aucun nouvel utilisateur à découvrir pour le moment.
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

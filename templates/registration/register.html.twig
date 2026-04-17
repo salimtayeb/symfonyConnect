@@ -1,0 +1,228 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Inscription{% endblock %}
+
+{% block body %}
+<style>
+    .register-page {
+        max-width: 760px;
+        margin: 40px auto;
+        padding: 0 16px 40px;
+    }
+
+    .register-title {
+        font-size: 32px;
+        font-weight: 700;
+        margin-bottom: 24px;
+        color: #1f2937;
+    }
+
+    .register-card {
+        background: #ffffff;
+        border: 1px solid #e5e7eb;
+        border-radius: 18px;
+        padding: 24px;
+        box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
+    }
+
+    .register-subtitle {
+        margin: 0 0 20px;
+        color: #6b7280;
+        font-size: 15px;
+    }
+
+    .form-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 18px;
+    }
+
+    .form-group {
+        margin-bottom: 18px;
+    }
+
+    .form-group-full {
+        grid-column: 1 / -1;
+    }
+
+    .form-group label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 600;
+        color: #111827;
+    }
+
+    .form-control {
+        width: 100%;
+        border: 1px solid #d1d5db;
+        border-radius: 12px;
+        padding: 14px 16px;
+        font-size: 15px;
+        outline: none;
+        box-sizing: border-box;
+        background: #f9fafb;
+    }
+
+    .form-control:focus {
+        border-color: #60a5fa;
+        background: #ffffff;
+        box-shadow: 0 0 0 4px rgba(96, 165, 250, 0.15);
+    }
+
+    .form-errors {
+        color: #b91c1c;
+        font-size: 14px;
+        margin-top: 6px;
+    }
+
+    .form-global-errors {
+        background: #fef2f2;
+        border: 1px solid #fecaca;
+        color: #b91c1c;
+        border-radius: 12px;
+        padding: 12px 14px;
+        margin-bottom: 18px;
+    }
+
+    .checkbox-group {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-top: 8px;
+    }
+
+    .checkbox-group input {
+        width: 18px;
+        height: 18px;
+    }
+
+    .actions {
+        display: flex;
+        justify-content: flex-end;
+        margin-top: 8px;
+    }
+
+    .btn-primary {
+        border: none;
+        background: linear-gradient(135deg, #60a5fa, #2563eb);
+        color: white;
+        padding: 12px 22px;
+        border-radius: 12px;
+        font-size: 15px;
+        font-weight: 600;
+        cursor: pointer;
+        box-shadow: 0 6px 16px rgba(37, 99, 235, 0.25);
+    }
+
+    .login-link {
+        margin-top: 18px;
+        color: #6b7280;
+        font-size: 14px;
+        text-align: center;
+    }
+
+    .login-link a {
+        color: #2563eb;
+        text-decoration: none;
+        font-weight: 600;
+    }
+
+    body {
+        background: #f3f4f6;
+    }
+
+    @media (max-width: 700px) {
+        .form-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .form-group-full {
+            grid-column: auto;
+        }
+    }
+</style>
+
+<div class="register-page">
+    <h1 class="register-title">Créer un compte</h1>
+
+    <div class="register-card">
+        <p class="register-subtitle">
+            Rejoins SymfoConnect et partage tes moments avec la communauté.
+        </p>
+
+        {% for flash_error in app.flashes('verify_email_error') %}
+            <div class="form-global-errors">{{ flash_error }}</div>
+        {% endfor %}
+
+        {{ form_start(registrationForm) }}
+
+            {% if not registrationForm.vars.valid %}
+                <div class="form-global-errors">
+                    {{ form_errors(registrationForm) }}
+                </div>
+            {% endif %}
+
+            <div class="form-grid">
+                <div class="form-group">
+                    {{ form_label(registrationForm.firstName) }}
+                    {{ form_widget(registrationForm.firstName, {'attr': {'class': 'form-control', 'placeholder': 'Prénom'}}) }}
+                    <div class="form-errors">{{ form_errors(registrationForm.firstName) }}</div>
+                </div>
+
+                <div class="form-group">
+                    {{ form_label(registrationForm.lastName) }}
+                    {{ form_widget(registrationForm.lastName, {'attr': {'class': 'form-control', 'placeholder': 'Nom'}}) }}
+                    <div class="form-errors">{{ form_errors(registrationForm.lastName) }}</div>
+                </div>
+
+                <div class="form-group">
+                    {{ form_label(registrationForm.birthDate) }}
+                    {{ form_widget(registrationForm.birthDate, {'attr': {'class': 'form-control'}}) }}
+                    <div class="form-errors">{{ form_errors(registrationForm.birthDate) }}</div>
+                </div>
+
+                <div class="form-group">
+                    {{ form_label(registrationForm.city) }}
+                    {{ form_widget(registrationForm.city, {'attr': {'class': 'form-control', 'placeholder': 'Ville'}}) }}
+                    <div class="form-errors">{{ form_errors(registrationForm.city) }}</div>
+                </div>
+
+                <div class="form-group">
+                    {{ form_label(registrationForm.username) }}
+                    {{ form_widget(registrationForm.username, {'attr': {'class': 'form-control', 'placeholder': 'Nom d’utilisateur'}}) }}
+                    <div class="form-errors">{{ form_errors(registrationForm.username) }}</div>
+                </div>
+
+                <div class="form-group">
+                    {{ form_label(registrationForm.email) }}
+                    {{ form_widget(registrationForm.email, {'attr': {'class': 'form-control', 'placeholder': 'Email'}}) }}
+                    <div class="form-errors">{{ form_errors(registrationForm.email) }}</div>
+                </div>
+
+                <div class="form-group form-group-full">
+                    {{ form_label(registrationForm.plainPassword) }}
+                    {{ form_widget(registrationForm.plainPassword, {'attr': {'class': 'form-control', 'placeholder': 'Mot de passe'}}) }}
+                    <div class="form-errors">{{ form_errors(registrationForm.plainPassword) }}</div>
+                </div>
+
+                <div class="form-group form-group-full">
+                    <div class="checkbox-group">
+                        {{ form_widget(registrationForm.agreeTerms) }}
+                        {{ form_label(registrationForm.agreeTerms) }}
+                    </div>
+                    <div class="form-errors">{{ form_errors(registrationForm.agreeTerms) }}</div>
+                </div>
+            </div>
+
+            <div class="actions">
+                <button type="submit" class="btn-primary">S’inscrire</button>
+            </div>
+
+        {{ form_end(registrationForm) }}
+
+        <p class="login-link">
+            Déjà un compte ? <a href="{{ path('app_login') }}">Se connecter</a>
+        </p>
+    </div>
+</div>
+{% endblock %}

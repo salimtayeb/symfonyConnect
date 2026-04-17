@@ -1,0 +1,182 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Connexion{% endblock %}
+
+{% block body %}
+<style>
+    .login-page {
+        max-width: 720px;
+        margin: 50px auto;
+        padding: 0 16px 40px;
+    }
+
+    .login-card {
+        background: #ffffff;
+        border: 1px solid #e5e7eb;
+        border-radius: 20px;
+        padding: 28px;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+    }
+
+    .login-title {
+        font-size: 32px;
+        font-weight: 700;
+        margin: 0 0 10px;
+        color: #1f2937;
+    }
+
+    .login-subtitle {
+        margin: 0 0 24px;
+        color: #6b7280;
+        font-size: 15px;
+    }
+
+    .form-group {
+        margin-bottom: 18px;
+    }
+
+    .form-group label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 600;
+        color: #111827;
+    }
+
+    .form-control {
+        width: 100%;
+        border: 1px solid #d1d5db;
+        border-radius: 12px;
+        padding: 14px 16px;
+        font-size: 15px;
+        outline: none;
+        box-sizing: border-box;
+        background: #f9fafb;
+    }
+
+    .form-control:focus {
+        border-color: #60a5fa;
+        background: #ffffff;
+        box-shadow: 0 0 0 4px rgba(96, 165, 250, 0.15);
+    }
+
+    .login-error {
+        background: #fee2e2;
+        color: #991b1b;
+        border: 1px solid #fca5a5;
+        border-radius: 12px;
+        padding: 12px 14px;
+        margin-bottom: 18px;
+        font-size: 14px;
+        font-weight: 600;
+    }
+
+    .login-info {
+        background: #eef2ff;
+        color: #3730a3;
+        border: 1px solid #c7d2fe;
+        border-radius: 12px;
+        padding: 12px 14px;
+        margin-bottom: 18px;
+        font-size: 14px;
+    }
+
+    .actions {
+        display: flex;
+        justify-content: flex-end;
+        margin-top: 8px;
+    }
+
+    .btn-primary {
+        border: none;
+        background: linear-gradient(135deg, #60a5fa, #2563eb);
+        color: white;
+        padding: 12px 22px;
+        border-radius: 12px;
+        font-size: 15px;
+        font-weight: 600;
+        cursor: pointer;
+        box-shadow: 0 6px 16px rgba(37, 99, 235, 0.25);
+    }
+
+    .register-link {
+        margin-top: 18px;
+        color: #6b7280;
+        font-size: 14px;
+        text-align: center;
+    }
+
+    .register-link a {
+        color: #2563eb;
+        text-decoration: none;
+        font-weight: 600;
+    }
+</style>
+
+<div class="login-page">
+    <div class="login-card">
+        <h1 class="login-title">Connexion</h1>
+        <p class="login-subtitle">
+            Connecte-toi à ton compte pour accéder à ton fil d’actualité.
+        </p>
+
+        {% if error %}
+            <div class="login-error">
+                {{ error.messageKey|trans(error.messageData, 'security') }}
+            </div>
+        {% endif %}
+
+        {% if app.user %}
+            <div class="login-info">
+                Tu es connecté en tant que <strong>{{ app.user.userIdentifier }}</strong>.
+                <a href="{{ path('app_logout') }}">Se déconnecter</a>
+            </div>
+        {% endif %}
+
+        <form method="post">
+            <div class="form-group">
+                <label for="inputEmail">Email</label>
+                <input
+                    type="email"
+                    value="{{ last_username }}"
+                    name="email"
+                    id="inputEmail"
+                    class="form-control"
+                    autocomplete="email"
+                    required
+                    autofocus
+                >
+            </div>
+
+            <div class="form-group">
+                <label for="inputPassword">Mot de passe</label>
+                <input
+                    type="password"
+                    name="password"
+                    id="inputPassword"
+                    class="form-control"
+                    autocomplete="current-password"
+                    required
+                >
+            </div>
+
+            <input
+                type="hidden"
+                name="_csrf_token"
+                data-controller="csrf-protection"
+                value="{{ csrf_token('authenticate') }}"
+            >
+
+            <div class="actions">
+                <button class="btn-primary" type="submit">
+                    Se connecter
+                </button>
+            </div>
+        </form>
+
+        <p class="register-link">
+            Tu n’as pas encore de compte ?
+            <a href="{{ path('app_register') }}">Créer un compte</a>
+        </p>
+    </div>
+</div>
+{% endblock %}

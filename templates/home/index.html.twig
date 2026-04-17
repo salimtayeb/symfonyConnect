@@ -1,0 +1,603 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Accueil{% endblock %}
+
+{% block body %}
+<style>
+    .feed-page {
+        max-width: 720px;
+        margin: 40px auto;
+        padding: 0 16px 40px;
+    }
+
+    .feed-title {
+        font-size: 32px;
+        font-weight: 700;
+        margin-bottom: 24px;
+        color: #1f2937;
+    }
+
+    .create-post-card {
+        background: #ffffff;
+        border: 1px solid #e5e7eb;
+        border-radius: 18px;
+        padding: 20px;
+        box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
+        margin-bottom: 24px;
+    }
+
+    .create-post-title {
+        margin: 0 0 14px;
+        font-size: 20px;
+        font-weight: 700;
+        color: #1f2937;
+    }
+
+    .form-group {
+        margin-bottom: 14px;
+    }
+
+    .form-group label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 600;
+        color: #111827;
+    }
+
+    .form-control,
+    .form-textarea {
+        width: 100%;
+        border: 1px solid #d1d5db;
+        border-radius: 12px;
+        padding: 14px 16px;
+        font-size: 15px;
+        outline: none;
+        box-sizing: border-box;
+        background: #f9fafb;
+    }
+
+    .form-textarea {
+        min-height: 120px;
+        resize: vertical;
+    }
+
+    .form-control:focus,
+    .form-textarea:focus {
+        border-color: #60a5fa;
+        background: #ffffff;
+        box-shadow: 0 0 0 4px rgba(96, 165, 250, 0.15);
+    }
+
+    .form-errors {
+        color: #b91c1c;
+        font-size: 14px;
+        margin-top: 6px;
+    }
+
+    .create-post-actions {
+        display: flex;
+        justify-content: flex-end;
+    }
+
+    .create-post-button {
+        border: none;
+        background: linear-gradient(135deg, #60a5fa, #2563eb);
+        color: white;
+        padding: 12px 22px;
+        border-radius: 12px;
+        font-size: 15px;
+        font-weight: 600;
+        cursor: pointer;
+        box-shadow: 0 6px 16px rgba(37, 99, 235, 0.25);
+    }
+
+    .empty-following {
+        background: #ffffff;
+        border: 1px dashed #d1d5db;
+        border-radius: 18px;
+        padding: 24px;
+        text-align: center;
+        color: #6b7280;
+        margin-bottom: 24px;
+    }
+
+    .suggestions-card {
+        background: #ffffff;
+        border: 1px solid #e5e7eb;
+        border-radius: 18px;
+        padding: 20px;
+        box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
+        margin-bottom: 24px;
+    }
+
+    .suggestions-title {
+        margin: 0 0 16px;
+        font-size: 20px;
+        font-weight: 700;
+        color: #1f2937;
+    }
+
+    .suggestions-list {
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+    }
+
+    .suggestion-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 12px 0;
+        border-top: 1px solid #f3f4f6;
+    }
+
+    .suggestion-item:first-child {
+        border-top: none;
+        padding-top: 0;
+    }
+
+    .suggestion-user {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        text-decoration: none;
+        color: inherit;
+    }
+
+    .suggestion-avatar {
+        width: 42px;
+        height: 42px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #60a5fa, #2563eb);
+        color: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+    }
+
+    .suggestion-name {
+        font-weight: 700;
+        color: #111827;
+    }
+
+    .suggestion-meta {
+        font-size: 13px;
+        color: #6b7280;
+    }
+
+    .feed-list {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    .post-card {
+        background: #ffffff;
+        border: 1px solid #e5e7eb;
+        border-radius: 18px;
+        padding: 18px 20px;
+        box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
+    }
+
+    .post-header {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 16px;
+        margin-bottom: 14px;
+    }
+
+    .post-author {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        text-decoration: none;
+        color: inherit;
+        flex: 1;
+    }
+
+    .post-avatar {
+        width: 44px;
+        height: 44px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #60a5fa, #2563eb);
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        font-size: 18px;
+        flex-shrink: 0;
+    }
+
+    .post-name {
+        margin: 0;
+        font-size: 16px;
+        font-weight: 700;
+        color: #111827;
+    }
+
+    .post-date {
+        font-size: 13px;
+        color: #6b7280;
+    }
+
+    .post-content {
+        font-size: 16px;
+        line-height: 1.6;
+        color: #374151;
+        margin: 0 0 14px;
+    }
+
+    .post-footer {
+        border-top: 1px solid #f3f4f6;
+        padding-top: 12px;
+        font-size: 14px;
+        color: #6b7280;
+    }
+
+    .empty-feed {
+        background: white;
+        border: 1px dashed #d1d5db;
+        border-radius: 18px;
+        padding: 30px;
+        text-align: center;
+        color: #6b7280;
+    }
+
+    .author-meta {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+    }
+
+    .follow-badge {
+        display: inline-block;
+        width: fit-content;
+        padding: 4px 10px;
+        border-radius: 999px;
+        font-size: 12px;
+        font-weight: 600;
+    }
+
+    .follow-badge-friend {
+        background: #ecfdf5;
+        color: #065f46;
+        border: 1px solid #a7f3d0;
+    }
+
+    .follow-badge-not-following {
+        background: #f3f4f6;
+        color: #6b7280;
+        border: 1px solid #e5e7eb;
+    }
+
+    .follow-form {
+        margin: 0;
+        flex-shrink: 0;
+    }
+
+    .follow-button {
+        border: none;
+        border-radius: 10px;
+        padding: 8px 14px;
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+    }
+
+    .follow-button-primary {
+        background: linear-gradient(135deg, #60a5fa, #2563eb);
+        color: #fff;
+        box-shadow: 0 6px 16px rgba(37, 99, 235, 0.20);
+    }
+
+    .follow-button-secondary {
+        background: #fee2e2;
+        color: #991b1b;
+        border: 1px solid #fecaca;
+    }
+
+    .like-zone {
+        margin-top: 12px;
+    }
+
+    .like-button {
+        border: none;
+        background: none;
+        cursor: pointer;
+        font-weight: 600;
+        font-size: 15px;
+        padding: 0;
+    }
+
+    .delete-zone {
+        margin-top: 12px;
+    }
+
+    .delete-button {
+        border: none;
+        border-radius: 10px;
+        padding: 8px 14px;
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+        background: #fee2e2;
+        color: #991b1b;
+        border: 1px solid #fecaca;
+    }
+
+    .comments-zone {
+        margin-top: 16px;
+        padding-top: 14px;
+        border-top: 1px solid #f3f4f6;
+    }
+
+    .comments-title {
+        font-size: 14px;
+        font-weight: 700;
+        color: #374151;
+        margin-bottom: 10px;
+    }
+
+    .comments-list {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        margin-bottom: 14px;
+    }
+
+    .comment-item {
+        background: #f9fafb;
+        border: 1px solid #e5e7eb;
+        border-radius: 12px;
+        padding: 10px 12px;
+    }
+
+    .comment-author {
+        font-size: 13px;
+        font-weight: 700;
+        color: #111827;
+        margin-bottom: 4px;
+    }
+
+    .comment-content {
+        font-size: 14px;
+        color: #374151;
+        margin-bottom: 4px;
+    }
+
+    .comment-date {
+        font-size: 12px;
+        color: #6b7280;
+    }
+
+    .comment-form textarea {
+        width: 100%;
+        border: 1px solid #d1d5db;
+        border-radius: 12px;
+        padding: 10px 12px;
+        font-size: 14px;
+        background: #f9fafb;
+        resize: vertical;
+        box-sizing: border-box;
+    }
+
+    .comment-form button {
+        margin-top: 8px;
+        border: none;
+        background: linear-gradient(135deg, #60a5fa, #2563eb);
+        color: white;
+        padding: 8px 14px;
+        border-radius: 10px;
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+    }
+
+    body {
+        background: #f3f4f6;
+    }
+</style>
+
+<div class="feed-page">
+    <h1 class="feed-title">Fil d’actualité</h1>
+
+    <div class="create-post-card">
+        <h2 class="create-post-title">Créer un post</h2>
+
+        {{ form_start(postForm) }}
+            <div class="form-group">
+                {{ form_label(postForm.description) }}
+                {{ form_widget(postForm.description, {
+                    attr: {
+                        class: 'form-textarea',
+                        placeholder: 'Exprime-toi...'
+                    }
+                }) }}
+                <div class="form-errors">{{ form_errors(postForm.description) }}</div>
+            </div>
+
+            <div class="form-group">
+                {{ form_label(postForm.lieu) }}
+                {{ form_widget(postForm.lieu, {
+                    attr: {
+                        class: 'form-control',
+                        placeholder: 'Exemple : Montpellier, France'
+                    }
+                }) }}
+                <div class="form-errors">{{ form_errors(postForm.lieu) }}</div>
+            </div>
+
+            <div class="form-group">
+                {{ form_label(postForm.image) }}
+                {{ form_widget(postForm.image, {
+                    attr: {
+                        class: 'form-control',
+                        placeholder: 'https://...'
+                    }
+                }) }}
+                <div class="form-errors">{{ form_errors(postForm.image) }}</div>
+            </div>
+
+            <div class="create-post-actions">
+                <button type="submit" class="create-post-button">Publier</button>
+            </div>
+        {{ form_end(postForm) }}
+    </div>
+
+    {% if posts is empty %}
+        <div class="empty-following">
+            <p>Tu ne suis encore personne. Commence par ajouter des amis ci-dessous.</p>
+        </div>
+    {% endif %}
+
+    {% if suggestedUsers is not empty %}
+        <div class="suggestions-card">
+            <h2 class="suggestions-title">Suggestions d'amis</h2>
+
+            <div class="suggestions-list">
+                {% for suggestedUser in suggestedUsers %}
+                    <div class="suggestion-item">
+                        <a
+                            href="{{ path('app_profile', {username: suggestedUser.username}) }}"
+                            class="suggestion-user"
+                        >
+                            <div class="suggestion-avatar">
+                                {{ suggestedUser.username|slice(0, 1)|upper }}
+                            </div>
+
+                            <div>
+                                <div class="suggestion-name">{{ suggestedUser.username }}</div>
+                                <div class="suggestion-meta">
+                                    Inscrit le {{ suggestedUser.createdAt|date('d/m/Y') }}
+                                </div>
+                            </div>
+                        </a>
+
+                        <form method="post" action="{{ path('app_profile_follow', {username: suggestedUser.username}) }}">
+                            <button type="submit" class="follow-button follow-button-primary">
+                                Follow
+                            </button>
+                        </form>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    {% endif %}
+
+    <div class="feed-list">
+        {% for post in posts %}
+            <article class="post-card">
+                <div class="post-header">
+                    <a
+                        href="{{ path('app_profile', {username: post.user.username}) }}"
+                        class="post-author"
+                    >
+                        <div class="post-avatar">
+                            {{ post.user.username|slice(0, 1)|upper }}
+                        </div>
+
+                        <div class="author-meta">
+                            <p class="post-name">{{ post.user.username }}</p>
+                            <span class="post-date">{{ post.createdAt|date('d/m/Y à H:i') }}</span>
+
+                            {% if app.user and app.user.username != post.user.username %}
+                                {% if app.user.isFollowing(post.user) %}
+                                    <span class="follow-badge follow-badge-friend">Ami</span>
+                                {% else %}
+                                    <span class="follow-badge follow-badge-not-following">Pas encore suivi</span>
+                                {% endif %}
+                            {% endif %}
+                        </div>
+                    </a>
+
+                    {% if app.user and app.user.username != post.user.username %}
+                        <form
+                            method="post"
+                            action="{{ path('app_profile_follow', {username: post.user.username}) }}"
+                            class="follow-form"
+                        >
+                            {% if app.user.isFollowing(post.user) %}
+                                <button type="submit" class="follow-button follow-button-secondary">
+                                    Unfollow
+                                </button>
+                            {% else %}
+                                <button type="submit" class="follow-button follow-button-primary">
+                                    Follow
+                                </button>
+                            {% endif %}
+                        </form>
+                    {% endif %}
+                </div>
+
+                <p class="post-content">{{ post.description }}</p>
+
+                {% if post.lieu %}
+                    <div class="post-footer">
+                        📍 {{ post.lieu }}
+                    </div>
+                {% endif %}
+
+                <div class="like-zone">
+                    <form method="post" action="{{ path('app_post_like', {id: post.id}) }}">
+                        <button
+                            type="submit"
+                            class="like-button"
+                            style="color: {{ app.user and post.isLikedBy(app.user) ? '#ef4444' : '#6b7280' }};"
+                        >
+                            ❤️ {{ post.likedBy|length }}
+                        </button>
+                    </form>
+                </div>
+
+                {% if app.user and post.user.id == app.user.id %}
+                    <div class="delete-zone">
+                        <form
+                            method="post"
+                            action="{{ path('app_post_delete', {id: post.id}) }}"
+                            onsubmit="return confirm('Voulez-vous vraiment supprimer ce post ?');"
+                        >
+                            <input type="hidden" name="_token" value="{{ csrf_token('delete_post_' ~ post.id) }}">
+                            <button type="submit" class="delete-button">
+                                Supprimer
+                            </button>
+                        </form>
+                    </div>
+                {% endif %}
+
+                <div class="comments-zone">
+                    <div class="comments-title">
+                        💬 {{ post.comments|length }} commentaire{{ post.comments|length > 1 ? 's' : '' }}
+                    </div>
+
+                    {% if post.comments is not empty %}
+                        <div class="comments-list">
+                            {% for comment in post.comments %}
+                                <div class="comment-item">
+                                    <div class="comment-author">{{ comment.user.username }}</div>
+                                    <div class="comment-content">{{ comment.content }}</div>
+                                    <div class="comment-date">{{ comment.createdAt|date('d/m/Y à H:i') }}</div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+
+                    <div class="comment-form">
+                        {{ form_start(commentForms[post.id]) }}
+                            {{ form_widget(commentForms[post.id].content) }}
+                            <button type="submit">Commenter</button>
+                        {{ form_end(commentForms[post.id]) }}
+                    </div>
+                </div>
+            </article>
+        {% else %}
+            <div class="empty-feed">
+                <p>Aucun post pour le moment.</p>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

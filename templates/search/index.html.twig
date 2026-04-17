@@ -1,0 +1,399 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Profil de {{ profileUser.username }}{% endblock %}
+
+{% block body %}
+<style>
+    .profile-page {
+        max-width: 720px;
+        margin: 40px auto;
+        padding: 0 16px 40px;
+    }
+
+    .profile-card,
+    .post-card {
+        background: #fff;
+        border: 1px solid #e5e7eb;
+        border-radius: 18px;
+        padding: 20px;
+        box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
+    }
+
+    .profile-card {
+        margin-bottom: 24px;
+    }
+
+    .profile-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+    }
+
+    .profile-header-left {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+    }
+
+    .profile-avatar {
+        width: 64px;
+        height: 64px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #60a5fa, #2563eb);
+        color: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 24px;
+        font-weight: bold;
+    }
+
+    .profile-name {
+        margin: 0;
+        font-size: 24px;
+        font-weight: 700;
+    }
+
+    .profile-bio {
+        margin-top: 8px;
+        color: #6b7280;
+    }
+
+    .profile-meta {
+        margin-top: 10px;
+        color: #6b7280;
+        font-size: 14px;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+    }
+
+    .profile-stats {
+        display: flex;
+        justify-content: space-around;
+        margin-top: 20px;
+        padding-top: 16px;
+        border-top: 1px solid #e5e7eb;
+    }
+
+    .profile-stats div {
+        text-align: center;
+    }
+
+    .profile-stats strong {
+        display: block;
+        font-size: 18px;
+        color: #111827;
+    }
+
+    .profile-stats span {
+        font-size: 13px;
+        color: #6b7280;
+    }
+
+    .private-info-title {
+        margin: 0 0 14px;
+        font-size: 20px;
+        font-weight: 700;
+    }
+
+    .private-info-row {
+        margin: 8px 0;
+        color: #374151;
+    }
+
+    .posts-list {
+        display: flex;
+        flex-direction: column;
+        gap: 18px;
+    }
+
+    .post-date {
+        font-size: 13px;
+        color: #6b7280;
+        margin-top: 8px;
+    }
+
+    .follow-form {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin: 0;
+    }
+
+    .profile-actions {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+
+    .friend-badge {
+        background: #ecfdf5;
+        color: #065f46;
+        border: 1px solid #a7f3d0;
+        border-radius: 999px;
+        padding: 8px 12px;
+        font-size: 13px;
+        font-weight: 600;
+    }
+
+    .follow-button {
+        border: none;
+        border-radius: 12px;
+        padding: 10px 16px;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+    }
+
+    .follow-button-primary {
+        background: linear-gradient(135deg, #60a5fa, #2563eb);
+        color: #fff;
+        box-shadow: 0 6px 16px rgba(37, 99, 235, 0.25);
+    }
+
+    .follow-button-secondary {
+        background: #fee2e2;
+        color: #991b1b;
+        border: 1px solid #fecaca;
+    }
+
+    .message-link {
+        display: inline-block;
+        text-decoration: none;
+        border-radius: 12px;
+        padding: 10px 16px;
+        font-size: 14px;
+        font-weight: 600;
+        background: linear-gradient(135deg, #60a5fa, #2563eb);
+        color: #fff;
+        box-shadow: 0 6px 16px rgba(37, 99, 235, 0.25);
+    }
+
+    body {
+        background: #f3f4f6;
+    }
+</style>
+
+<div class="profile-page">
+    <div class="profile-card">
+        <div class="profile-header">
+            <div class="profile-header-left">
+                <div class="profile-avatar">
+                    {{ profileUser.username|slice(0, 1)|upper }}
+                </div>
+
+                <div>
+                    <h1 class="profile-name">{{ profileUser.username }}</h1>
+
+                    <p class="profile-bio">
+                        {{ profileUser.bio ?: 'Aucune bio renseignée.' }}
+                    </p>
+
+                    <div class="profile-meta">
+                        <span>📅 Inscrit le {{ profileUser.createdAt|date('d/m/Y') }}</span>
+
+                        {% if profileUser.profile and profileUser.profile.birthDate %}
+                            <span>🎂 Né(e) le {{ profileUser.profile.birthDate|date('d/m/Y') }}</span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            {% if app.user and not isOwner %}
+                <div class="profile-actions">
+                    {% if app.user.isFollowing(profileUser) %}
+                        <span class="friend-badge">{{ profileUser.username }} est ton ami</span>
+
+                        <a
+                            href="{{ path('app_message_show', { id: profileUser.id }) }}"
+                            class="message-link"
+                        >
+                            Envoyer un message
+                        </a>
+
+                        <form method="post" action="{{ path('app_profile_follow', {username: profileUser.username}) }}" class="follow-form">
+                            <button type="submit" class="follow-button follow-button-secondary">
+                                Unfollow
+                            </button>
+                        </form>
+                    {% else %}
+                        <form method="post" action="{{ path('app_profile_follow', {username: profileUser.username}) }}" class="follow-form">
+                            <button type="submit" class="follow-button follow-button-primary">
+                                Follow
+                            </button>
+                        </form>
+                    {% endif %}
+                </div>
+            {% endif %}
+        </div>
+
+        <div class="profile-stats">
+            <div>
+                <strong>{{ profileUser.followers|length }}</strong>
+                <span>Followers</span>
+            </div>
+
+            <div>
+                <strong>{{ profileUser.following|length }}</strong>
+                <span>Suit</span>
+            </div>
+
+            <div>
+                <strong>{{ posts|length }}</strong>
+                <span>Posts</span>
+            </div>
+        </div>
+    </div>
+
+    {% if isOwner %}
+        <div class="profile-card">
+            <h2 class="private-info-title">Mes informations personnelles</h2>
+
+            <p class="private-info-row"><strong>Email :</strong> {{ profileUser.email }}</p>
+
+            {% if profileUser.profile %}
+                <p class="private-info-row"><strong>Prénom :</strong> {{ profileUser.profile.firstName }}</p>
+                <p class="private-info-row"><strong>Nom :</strong> {{ profileUser.profile.lastName }}</p>
+                <p class="private-info-row"><strong>Lieu d’habitat :</strong> {{ profileUser.profile.city }}</p>
+            {% endif %}
+        </div>
+    {% endif %}
+
+    <div class="posts-list">
+        {% for post in posts %}
+            <article class="post-card">
+                <p>{{ post.description }}</p>
+
+                {% if post.lieu %}
+                    <p>📍 {{ post.lieu }}</p>
+                {% endif %}
+
+                <div class="post-date">{{ post.createdAt|date('d/m/Y à H:i') }}</div>
+
+                <div style="margin-top: 14px; display: flex; align-items: center; gap: 10px;">
+                    <form method="post" action="{{ path('app_post_like', {id: post.id}) }}">
+                        <button
+                            type="submit"
+                            style="
+                                border: none;
+                                background: {{ app.user and post.isLikedBy(app.user) ? 'linear-gradient(135deg,#ef4444,#f87171)' : '#eef2f7' }};
+                                color: {{ app.user and post.isLikedBy(app.user) ? 'white' : '#374151' }};
+                                border-radius: 999px;
+                                padding: 8px 14px;
+                                font-weight: 700;
+                                cursor: pointer;
+                            "
+                        >
+                            ❤️ {{ post.likedBy|length }}
+                        </button>
+                    </form>
+
+                    <span style="font-size: 13px; color: #6b7280;">
+                        {{ post.likedBy|length }} like{{ post.likedBy|length > 1 ? 's' : '' }}
+                    </span>
+                </div>
+
+                <div style="
+                    margin-top: 16px;
+                    padding-top: 14px;
+                    border-top: 1px solid #f3f4f6;
+                ">
+                    <div style="
+                        font-size: 14px;
+                        font-weight: 700;
+                        color: #374151;
+                        margin-bottom: 10px;
+                    ">
+                        💬 {{ post.comments|length }} commentaire{{ post.comments|length > 1 ? 's' : '' }}
+                    </div>
+
+                    {% if post.comments is not empty %}
+                        <div style="
+                            display: flex;
+                            flex-direction: column;
+                            gap: 10px;
+                            margin-bottom: 14px;
+                        ">
+                            {% for comment in post.comments %}
+                                <div style="
+                                    background: #f8fafc;
+                                    border: 1px solid #e5e7eb;
+                                    border-radius: 14px;
+                                    padding: 12px;
+                                ">
+                                    <div style="
+                                        font-size: 13px;
+                                        font-weight: 700;
+                                        color: #111827;
+                                        margin-bottom: 4px;
+                                    ">
+                                        {{ comment.user.username }}
+                                    </div>
+
+                                    <div style="
+                                        font-size: 14px;
+                                        color: #374151;
+                                        margin-bottom: 4px;
+                                    ">
+                                        {{ comment.content }}
+                                    </div>
+
+                                    <div style="
+                                        font-size: 12px;
+                                        color: #6b7280;
+                                    ">
+                                        {{ comment.createdAt|date('d/m/Y à H:i') }}
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+
+                    {% if app.user is not null %}
+                        <div>
+                            {{ form_start(commentForms[post.id]) }}
+
+                                {{ form_widget(commentForms[post.id].content, {
+                                    attr: {
+                                        style: '
+                                            width:100%;
+                                            border-radius:12px;
+                                            border:1px solid #d1d5db;
+                                            padding:10px;
+                                            background:#f9fafb;
+                                            box-sizing:border-box;
+                                        ',
+                                        placeholder: 'Écris un commentaire...'
+                                    }
+                                }) }}
+
+                                <button type="submit" style="
+                                    margin-top: 8px;
+                                    background: linear-gradient(135deg,#60a5fa,#2563eb);
+                                    color: white;
+                                    border: none;
+                                    border-radius: 10px;
+                                    padding: 8px 14px;
+                                    font-size: 13px;
+                                    font-weight: 600;
+                                    cursor: pointer;
+                                ">
+                                    Commenter
+                                </button>
+
+                            {{ form_end(commentForms[post.id]) }}
+                        </div>
+                    {% endif %}
+                </div>
+            </article>
+        {% else %}
+            <article class="post-card">
+                <p>Cet utilisateur n’a encore publié aucun post.</p>
+            </article>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

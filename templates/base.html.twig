@@ -2,23 +2,162 @@
 <html>
     <head>
         <meta charset="UTF-8">
-        <title>{% block title %}Welcome!{% endblock %}</title>
-        <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 128 128%22><text y=%221.2em%22 font-size=%2296%22>⚫️</text><text y=%221.3em%22 x=%220.2em%22 font-size=%2276%22 fill=%22%23fff%22>sf</text></svg>">
-        {% block stylesheets %}
-        {% endblock %}
+        <title>{% block title %}SymfoConnect{% endblock %}</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
 
-        {% block javascripts %}
-            {% block importmap %}{{ importmap('app') }}{% endblock %}
-        {% endblock %}
+        {% block stylesheets %}{% endblock %}
+        {% block javascripts %}{% endblock %}
 
-        {% set frankenphpHotReload = app.request.server.get('FRANKENPHP_HOT_RELOAD') %}
-        {% if frankenphpHotReload %}
-        <meta name="frankenphp-hot-reload:url" content="{{ frankenphpHotReload }}">
-        <script src="https://cdn.jsdelivr.net/npm/idiomorph"></script>
-        <script src="https://cdn.jsdelivr.net/npm/frankenphp-hot-reload/+esm" type="module"></script>
-        {% endif %}
+        <style>
+            * {
+                box-sizing: border-box;
+            }
+
+            body {
+                margin: 0;
+                font-family: Arial, Helvetica, sans-serif;
+                background: #f3f4f6;
+                color: #1f2937;
+            }
+
+            .navbar {
+                background: #ffffff;
+                border-bottom: 1px solid #e5e7eb;
+                padding: 16px 24px;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                position: sticky;
+                top: 0;
+                z-index: 10;
+            }
+
+            .logo {
+                font-size: 24px;
+                font-weight: 700;
+                color: #2563eb;
+                text-decoration: none;
+            }
+
+            .nav-links {
+                display: flex;
+                gap: 16px;
+                align-items: center;
+            }
+
+            .nav-links a {
+                text-decoration: none;
+                color: #374151;
+                font-weight: 600;
+            }
+
+            .nav-links a:hover {
+                color: #2563eb;
+            }
+
+            .messages-link {
+                position: relative;
+                display: inline-flex;
+                align-items: center;
+            }
+
+            .messages-badge {
+                position: absolute;
+                top: -8px;
+                right: -14px;
+                background: #ef4444;
+                color: white;
+                font-size: 11px;
+                font-weight: 700;
+                border-radius: 999px;
+                padding: 3px 7px;
+                line-height: 1;
+                min-width: 20px;
+                text-align: center;
+                box-shadow: 0 4px 10px rgba(239, 68, 68, 0.25);
+            }
+
+            .page-container {
+                max-width: 1100px;
+                margin: 0 auto;
+            }
+
+            .flash-container {
+                max-width: 720px;
+                margin: 20px auto 0;
+                padding: 0 16px;
+            }
+
+            .flash {
+                padding: 14px 16px;
+                border-radius: 12px;
+                margin-bottom: 12px;
+                font-size: 14px;
+                font-weight: 600;
+            }
+
+            .flash-success {
+                background: #dcfce7;
+                color: #166534;
+                border: 1px solid #86efac;
+            }
+
+            .flash-error {
+                background: #fee2e2;
+                color: #991b1b;
+                border: 1px solid #fca5a5;
+            }
+        </style>
     </head>
     <body>
-        {% block body %}{% endblock %}
+        {% set unreadCount = globalUnreadCount ?? 0 %}
+
+        <nav class="navbar">
+            <a href="{{ path('app_landing') }}" class="logo">SymfoConnect</a>
+
+            <div class="nav-links">
+                {% if app.user %}
+                    <a href="{{ path('app_home') }}">Fil d’actualité</a>
+                    <a href="{{ path('app_discover') }}">Découvrir</a>
+
+                    <a href="{{ path('app_messages') }}" class="messages-link">
+                        Messagerie
+                        {% if unreadCount > 0 %}
+                            <span class="messages-badge">{{ unreadCount }}</span>
+                        {% endif %}
+                    </a>
+
+                    <a href="{{ path('app_profile', { username: app.user.username }) }}">{{ app.user.username }}</a>
+                    <a href="{{ path('app_logout') }}">Déconnexion</a>
+                {% else %}
+                    <a href="{{ path('app_login') }}">Connexion</a>
+                    <a href="{{ path('app_register') }}">Inscription</a>
+                {% endif %}
+            </div>
+        </nav>
+
+        <div class="flash-container">
+            {% for message in app.flashes('success') %}
+                <div class="flash flash-success">
+                    {{ message }}
+                </div>
+            {% endfor %}
+
+            {% for message in app.flashes('error') %}
+                <div class="flash flash-error">
+                    {{ message }}
+                </div>
+            {% endfor %}
+
+            {% for message in app.flashes('verify_email_error') %}
+                <div class="flash flash-error">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        </div>
+
+        <main class="page-container">
+            {% block body %}{% endblock %}
+        </main>
     </body>
 </html>

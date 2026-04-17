@@ -1,0 +1,133 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Bienvenue sur SymfoConnect{% endblock %}
+
+{% block body %}
+<style>
+    .landing-page {
+        max-width: 920px;
+        margin: 60px auto;
+        padding: 0 16px 40px;
+    }
+
+    .landing-card {
+        background: #ffffff;
+        border: 1px solid #e5e7eb;
+        border-radius: 24px;
+        padding: 48px 32px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
+        text-align: center;
+    }
+
+    .landing-title {
+        font-size: 42px;
+        margin: 0 0 16px;
+        color: #1f2937;
+    }
+
+    .landing-text {
+        font-size: 18px;
+        color: #6b7280;
+        margin: 0 auto 30px;
+        max-width: 680px;
+        line-height: 1.7;
+    }
+
+    .landing-actions {
+        display: flex;
+        justify-content: center;
+        gap: 16px;
+        flex-wrap: wrap;
+    }
+
+    .btn-primary,
+    .btn-secondary {
+        text-decoration: none;
+        padding: 14px 22px;
+        border-radius: 12px;
+        font-weight: 700;
+        font-size: 15px;
+        display: inline-block;
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, #60a5fa, #2563eb);
+        color: white;
+        box-shadow: 0 6px 16px rgba(37, 99, 235, 0.25);
+    }
+
+    .btn-secondary {
+        background: #eef2ff;
+        color: #2563eb;
+        border: 1px solid #c7d2fe;
+    }
+
+    .landing-features {
+        margin-top: 32px;
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 16px;
+    }
+
+    .feature-card {
+        background: #f9fafb;
+        border: 1px solid #e5e7eb;
+        border-radius: 16px;
+        padding: 18px;
+    }
+
+    .feature-card h3 {
+        margin: 0 0 8px;
+        font-size: 18px;
+        color: #111827;
+    }
+
+    .feature-card p {
+        margin: 0;
+        color: #6b7280;
+        font-size: 14px;
+        line-height: 1.6;
+    }
+
+    @media (max-width: 760px) {
+        .landing-title {
+            font-size: 32px;
+        }
+
+        .landing-features {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+
+<div class="landing-page">
+    <div class="landing-card">
+        <h1 class="landing-title">Bienvenue sur SymfoConnect</h1>
+
+        <p class="landing-text">
+            Crée ton compte, connecte-toi et partage tes moments avec la communauté.
+            Découvre les profils, publie tes posts et fais grandir ton réseau.
+        </p>
+
+        <div class="landing-actions">
+            <a href="{{ path('app_login') }}" class="btn-primary">Connexion</a>
+            <a href="{{ path('app_register') }}" class="btn-secondary">Inscription</a>
+        </div>
+
+        <div class="landing-features">
+            <div class="feature-card">
+                <h3>Publie facilement</h3>
+                <p>Partage une idée, une humeur ou un moment avec un formulaire simple et rapide.</p>
+            </div>
+            <div class="feature-card">
+                <h3>Crée ton profil</h3>
+                <p>Retrouve tes informations, ton nombre d’abonnés et tous tes posts au même endroit.</p>
+            </div>
+            <div class="feature-card">
+                <h3>Reste connecté</h3>
+                <p>Inscris-toi, connecte-toi et accède directement à ton fil d’actualité personnalisé.</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
