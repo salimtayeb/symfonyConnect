@@ -12,6 +12,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: PostRepository::class)]
@@ -23,13 +24,16 @@ use Symfony\Component\Validator\Constraints as Assert;
             security: "is_granted('ROLE_USER')",
             processor: PostProcessor::class
         )
-    ]
+    ],
+    normalizationContext: ['groups' => ['post:read']],
+    denormalizationContext: ['groups' => ['post:write']]
 )]
 class Post
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['post:read'])]
     private ?int $id = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
@@ -38,19 +42,24 @@ class Post
         min: 5,
         minMessage: 'Le contenu doit contenir au moins {{ limit }} caractères.'
     )]
+    #[Groups(['post:read', 'post:write'])]
     private ?string $description = null;
 
     #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(['post:read', 'post:write'])]
     private ?string $image = null;
 
     #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(['post:read', 'post:write'])]
     private ?string $lieu = null;
 
     #[ORM\ManyToOne(inversedBy: 'posts')]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['post:read'])]
     private ?User $user = null;
 
     #[ORM\Column]
+    #[Groups(['post:read'])]
     private ?\DateTimeImmutable $createdAt = null;
 
     /**

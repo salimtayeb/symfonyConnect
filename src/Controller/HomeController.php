@@ -14,6 +14,8 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Contracts\Cache\CacheInterface;
+use Symfony\Contracts\Cache\ItemInterface;
 
 final class HomeController extends AbstractController
 {
@@ -32,7 +34,8 @@ final class HomeController extends AbstractController
         Request $request,
         PostRepository $postRepository,
         UserRepository $userRepository,
-        EntityManagerInterface $entityManager
+        EntityManagerInterface $entityManager,
+        CacheInterface $cache
     ): Response {
         $this->denyAccessUnlessGranted('ROLE_USER');
 
@@ -54,6 +57,8 @@ final class HomeController extends AbstractController
             $entityManager->persist($post);
             $entityManager->flush();
 
+            $cache->clear();
+
             $this->addFlash('success', 'Le post a bien été créé.');
 
             return $this->redirectToRoute('app_home');
@@ -62,12 +67,21 @@ final class HomeController extends AbstractController
         $following = $user->getFollowing()->toArray();
         $following[] = $user;
 
-        $posts = $postRepository->createQueryBuilder('p')
-            ->where('p.user IN (:users)')
-            ->setParameter('users', $following)
-            ->orderBy('p.createdAt', 'DESC')
-            ->getQuery()
-            ->getResult();
+        $userIds = array_map(fn(User $followedUser) => $followedUser->getId(), $following);
+        sort($userIds);
+
+        $cacheKey = 'feed_posts_user_' . $user->getId() . '_' . md5(implode('_', $userIds));
+
+        $posts = $cache->get($cacheKey, function (ItemInterface $item) use ($postRepository, $following) {
+            $item->expiresAfter(300);
+
+            return $postRepository->createQueryBuilder('p')
+                ->where('p.user IN (:users)')
+                ->setParameter('users', $following)
+                ->orderBy('p.createdAt', 'DESC')
+                ->getQuery()
+                ->getResult();
+        });
 
         $suggestedUsers = $userRepository->createQueryBuilder('u')
             ->where('u != :currentUser')

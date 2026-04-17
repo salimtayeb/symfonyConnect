@@ -4,11 +4,13 @@ namespace App\Controller;
 
 use App\Entity\Message;
 use App\Entity\User;
+use App\Message\SendPrivateMessageEmail;
 use App\Repository\MessageRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Routing\Annotation\Route;
 
 class MessageController extends AbstractController
@@ -54,7 +56,7 @@ class MessageController extends AbstractController
     }
 
     #[Route('/messages/{id}', name: 'app_message_show', requirements: ['id' => '\d+'])]
-    public function show(User $otherUser, Request $request, EntityManagerInterface $em): Response
+    public function show(User $otherUser, Request $request, EntityManagerInterface $em, MessageBusInterface $bus): Response
     {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
 
@@ -80,6 +82,13 @@ class MessageController extends AbstractController
 
                 $em->persist($message);
                 $em->flush();
+
+                $bus->dispatch(new SendPrivateMessageEmail(
+                    $otherUser->getEmail() ?? '',
+                    $otherUser->getUsername() ?? '',
+                    $user->getUsername() ?? '',
+                    $message->getContent() ?? ''
+                ));
 
                 $this->addFlash('success', 'Message envoyé avec succès.');
 
